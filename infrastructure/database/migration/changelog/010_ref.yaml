@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-ref-enums
+      author: cash-manager
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              DO $$
+              BEGIN
+                IF NOT EXISTS (
+                  SELECT 1 FROM pg_type t
+                  JOIN pg_namespace n ON n.oid = t.typnamespace
+                  WHERE n.nspname = 'ref' AND t.typname = 'currency_code'
+                ) THEN
+                  CREATE TYPE ref.currency_code AS ENUM ('USD', 'RUB', 'EUR');
+                END IF;
+              END$$;
+  - changeSet:
+      id: 011-ref-categories
+      author: cash-manager
+      changes:
+        - createTable:
+            schemaName: ref
+            tableName: categories
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: icon, type: VARCHAR(50) }
+              - column: { name: color, type: VARCHAR(20) }
+              - column: { name: type, type: VARCHAR(20), constraints: { nullable: false } } # income | expense
+              - column: { name: created_at, type: TIMESTAMPTZ, defaultValueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_at, type: TIMESTAMPTZ, defaultValueComputed: CURRENT_TIMESTAMP }
+        - addUniqueConstraint:
+            schemaName: ref
+            tableName: categories
+            columnNames: user_id,name,type
+            constraintName: uq_categories_user_name_type
+  - changeSet:
+      id: 012-ref-subcategories
+      author: cash-manager
+      changes:
+        - createTable:
+            schemaName: ref
+            tableName: subcategories
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: category_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMPTZ, defaultValueComputed: CURRENT_TIMESTAMP }
+        - addForeignKeyConstraint:
+            baseTableSchemaName: ref
+            baseTableName: subcategories
+            baseColumnNames: category_id
+            referencedTableSchemaName: ref
+            referencedTableName: categories
+            referencedColumnNames: id
+            constraintName: fk_subcategories_category
+            onDelete: CASCADE
+
+

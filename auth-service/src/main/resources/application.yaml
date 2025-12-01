@@ -1,0 +1,42 @@
+server:
+  port: ${AUTH_SERVICE_PORT:8082}
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/cash_manager}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:9090/realms/cash-manager}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:9090/realms/cash-manager/protocol/openid-connect/certs}
+
+keycloak:
+  server-url: ${KEYCLOAK_SERVER_URL:http://localhost:9090}
+  realm: ${KEYCLOAK_REALM:cash-manager}
+  admin:
+    client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
+    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET:}
+    username: ${KEYCLOAK_ADMIN_USER:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+  client:
+    id: ${KEYCLOAK_CLIENT_ID:cash-manager-frontend}
+    secret: ${KEYCLOAK_CLIENT_SECRET:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

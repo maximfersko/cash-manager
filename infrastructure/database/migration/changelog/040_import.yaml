@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 040-import-files
+      author: cash-manager
+      changes:
+        - createTable:
+            schemaName: import
+            tableName: imported_files
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: filename, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: original_filename, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: file_type, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: file_size, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: storage_path, type: VARCHAR(500), constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(50), defaultValue: 'pending' }
+              - column: { name: error_message, type: TEXT }
+              - column: { name: total_transactions, type: INT }
+              - column: { name: processed_transactions, type: INT, defaultValueNumeric: 0 }
+              - column: { name: is_image, type: BOOLEAN, defaultValueBoolean: false }
+              - column: { name: metadata, type: JSONB }
+              - column: { name: created_at, type: TIMESTAMPTZ, defaultValueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_at, type: TIMESTAMPTZ, defaultValueComputed: CURRENT_TIMESTAMP }
+              - column: { name: completed_at, type: TIMESTAMPTZ }
+

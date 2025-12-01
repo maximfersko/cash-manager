@@ -1,0 +1,206 @@
+databaseChangeLog:
+  - changeSet:
+      id: 030-finance-accounts
+      author: cash-manager
+      changes:
+        - createTable:
+            schemaName: finance
+            tableName: accounts
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(120)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: currency
+                  type: VARCHAR(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: balance
+                  type: DECIMAL(18,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  - changeSet:
+      id: 031-finance-transactions
+      author: cash-manager
+      changes:
+        - createTable:
+            schemaName: finance
+            tableName: transactions
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_id
+                  type: UUID
+              - column:
+                  name: imported_file_id
+                  type: UUID
+              - column:
+                  name: processed_image_id
+                  type: UUID
+              - column:
+                  name: amount
+                  type: DECIMAL(18,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: currency
+                  type: VARCHAR(3)
+                  defaultValue: 'USD'
+              - column:
+                  name: transaction_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: transaction_time
+                  type: TIME
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: merchant_name
+                  type: VARCHAR(255)
+              - column:
+                  name: category_id
+                  type: UUID
+              - column:
+                  name: subcategory_id
+                  type: UUID
+              - column:
+                  name: is_income
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: tags
+                  type: TEXT
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: confidence_score
+                  type: DECIMAL(5,4)
+              - column:
+                  name: is_manual
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: source
+                  type: VARCHAR(50)
+                  defaultValue: 'manual'
+              - column:
+                  name: image_url
+                  type: VARCHAR(500)
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+        - addForeignKeyConstraint:
+            baseTableSchemaName: finance
+            baseTableName: transactions
+            baseColumnNames: category_id
+            referencedTableSchemaName: ref
+            referencedTableName: categories
+            referencedColumnNames: id
+            onDelete: SET NULL
+            constraintName: fk_tx_category
+
+        - addForeignKeyConstraint:
+            baseTableSchemaName: finance
+            baseTableName: transactions
+            baseColumnNames: subcategory_id
+            referencedTableSchemaName: ref
+            referencedTableName: subcategories
+            referencedColumnNames: id
+            onDelete: SET NULL
+            constraintName: fk_tx_subcategory
+
+  - changeSet:
+      id: 032-finance-budgets
+      author: cash-manager
+      changes:
+        - createTable:
+            schemaName: finance
+            tableName: budgets
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: DECIMAL(18,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: currency
+                  type: VARCHAR(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: period
+                  type: VARCHAR(10)
+                  defaultValue: 'month'
+              - column:
+                  name: period_start
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+        - addForeignKeyConstraint:
+            baseTableSchemaName: finance
+            baseTableName: budgets
+            baseColumnNames: category_id
+            referencedTableSchemaName: ref
+            referencedTableName: categories
+            referencedColumnNames: id
+            onDelete: CASCADE
+            constraintName: fk_budget_category

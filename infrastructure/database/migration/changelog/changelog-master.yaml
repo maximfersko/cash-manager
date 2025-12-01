@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - include:
+      file: 001_schemas.yaml
+  - include:
+      file: 010_ref.yaml
+  - include:
+      file: 020_auth.yaml
+  - include:
+      file: 030_finance.yaml
+  - include:
+      file: 040_import.yaml
+  - include:
+      file: 050_ocr.yaml
+  - include:
+      file: 060_indexes.yaml

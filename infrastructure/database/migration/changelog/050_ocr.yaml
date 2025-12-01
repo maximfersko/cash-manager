@@ -1,0 +1,79 @@
+databaseChangeLog:
+  - changeSet:
+      id: 050-ocr-processed-images
+      author: cash-manager
+      changes:
+        - createTable:
+            schemaName: ocr
+            tableName: processed_images
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: imported_file_id
+                  type: UUID
+              - column:
+                  name: original_image_path
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: processed_image_path
+                  type: VARCHAR(500)
+              - column:
+                  name: thumbnail_path
+                  type: VARCHAR(500)
+              - column:
+                  name: image_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: 'pending'
+              - column:
+                  name: ocr_provider
+                  type: VARCHAR(50)
+              - column:
+                  name: extracted_data
+                  type: JSONB
+              - column:
+                  name: confidence_score
+                  type: DECIMAL(5,4)
+              - column:
+                  name: error_message
+                  type: TEXT
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: processed_at
+                  type: TIMESTAMPTZ
+
+        - addForeignKeyConstraint:
+            baseTableSchemaName: ocr
+            baseTableName: processed_images
+            baseColumnNames: imported_file_id
+            referencedTableSchemaName: import
+            referencedTableName: imported_files
+            referencedColumnNames: id
+            onDelete: SET NULL
+            constraintName: fk_ocr_import_file

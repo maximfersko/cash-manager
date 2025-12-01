@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-schemas
+      author: cash-manager
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE SCHEMA IF NOT EXISTS auth;
+              CREATE SCHEMA IF NOT EXISTS ref;
+              CREATE SCHEMA IF NOT EXISTS finance;
+              CREATE SCHEMA IF NOT EXISTS import;
+              CREATE SCHEMA IF NOT EXISTS ocr;
+              CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+

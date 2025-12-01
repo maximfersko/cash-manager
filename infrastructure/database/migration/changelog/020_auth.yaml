@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 020-auth-users
+      author: cash-manager
+      changes:
+        - createTable:
+            schemaName: auth
+            tableName: users
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: email, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: password_hash, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: full_name, type: VARCHAR(255) }
+              - column: { name: locale, type: VARCHAR(5), defaultValue: 'ru' }
+              - column: { name: created_at, type: TIMESTAMPTZ, defaultValueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_at, type: TIMESTAMPTZ, defaultValueComputed: CURRENT_TIMESTAMP }
+        - addUniqueConstraint:
+            schemaName: auth
+            tableName: users
+            columnNames: email
+            constraintName: uq_users_email
+
+
