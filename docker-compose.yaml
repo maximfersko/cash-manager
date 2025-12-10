@@ -206,8 +206,55 @@ services:
       keycloak:
         condition: service_started
 
+  infisical-db:
+    image: postgres:15
+    container_name: infisical_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: infisical
+      POSTGRES_USER: infisical
+      POSTGRES_PASSWORD: infisical
+    volumes:
+      - infisical_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U infisical -d infisical" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  infisical:
+    image: infisical/infisical:latest
+    container_name: infisical
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    depends_on:
+      redis:
+        condition: service_started
+      infisical-db:
+        condition: service_healthy
+    environment:
+      AUTH_SECRET: "f3c6c23129d0f4b5c0e8294bf51e0c2abfb3e4d7a9c61c4f5e8a1d7b2c4e6f8a"
+      ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef"
+      ROOT_ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef"
+      SITE_URL: "http://localhost:3000"
+      REDIS_URL: "redis://redis:6379"
+      DATABASE_URL: "postgresql://infisical:infisical@infisical-db:5432/infisical"
+      DB_CONNECTION_URI: "postgresql://infisical:infisical@infisical-db:5432/infisical"
+      POSTGRES_HOST: "infisical-db"
+      POSTGRES_USER: "infisical"
+      POSTGRES_PASSWORD: "infisical"
+      POSTGRES_DB: "infisical"
+      POSTGRES_PORT: "5432"
+
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   frontend_dist:
   keycloak_db_data:
+  infisical_db_data:
